@@ -105,3 +105,29 @@ exports.deleteService = (serviceId) => {
         });
     });
 }
+
+exports.resetServiceTable = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM services;';
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+        });
+        resolve();
+    });
+}
+
+exports.resetAutoIncrementedServiceId = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM sqlite_sequence WHERE name='services';`
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+        });
+        resolve();
+    });
+}
