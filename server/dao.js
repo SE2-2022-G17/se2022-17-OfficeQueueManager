@@ -23,3 +23,16 @@ exports.getTeam = () => {
         });
     });
 }
+
+exports.createService = (service) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO services (name, time) VALUES (?, ?)';
+        db.run(sql, [service.name, service.time], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+}
