@@ -82,6 +82,16 @@ app.post('/api/services', isAdmin, async (req, res) => {
     }
 });
 
+app.delete('/api/services/:id', isAdmin, async (req, res) => {
+    const id = req.params.id;
+    try {
+        await dao.deleteService(id);
+        res.end();
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
 
 /*** Users APIs ***/
 

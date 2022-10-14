@@ -36,3 +36,16 @@ exports.createService = (service) => {
         });
     });
 }
+
+exports.deleteService = (serviceId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM services WHERE id=?';
+        db.run(sql, [serviceId], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+}
