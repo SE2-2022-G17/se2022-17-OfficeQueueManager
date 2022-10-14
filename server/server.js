@@ -95,6 +95,23 @@ app.post('/api/services', isAdmin, async (req, res) => {
     }
 });
 
+app.put('/api/services/:id', isAdmin, async (req, res) => {
+    const id = req.params.id;
+    const name = req.body.name;
+    const time = req.body.time;
+
+    try {
+        await dao.modifyService({
+            id: id,
+            name: name,
+            time: time
+        });
+        res.end();
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
 app.delete('/api/services/:id', isAdmin, async (req, res) => {
     const id = req.params.id;
     try {

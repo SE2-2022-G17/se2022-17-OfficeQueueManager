@@ -77,6 +77,22 @@ exports.createService = (service) => {
     });
 }
 
+exports.modifyService = (service) => {
+    return new Promise((resolve, reject) => {
+        const sql = `UPDATE services
+                    SET name=?, time=?
+                    WHERE id=?`;
+        db.run(sql, [service.name, service.time, service.id], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+};
+
+
 exports.deleteService = (serviceId) => {
     return new Promise((resolve, reject) => {
         const sql = 'DELETE FROM services WHERE id=?';
