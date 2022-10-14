@@ -24,6 +24,24 @@ exports.getTeam = () => {
     });
 }
 
+exports.getAllServices = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM services';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const services = rows.map((service) => ({
+                id: service.id,
+                name: service.name,
+                time: service.time
+            }));
+            resolve(services);
+        });
+    });
+}
+
 exports.createService = (service) => {
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO services (name, time) VALUES (?, ?)';

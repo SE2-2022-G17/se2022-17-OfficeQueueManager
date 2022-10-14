@@ -67,6 +67,12 @@ app.get('/api/team', (req, res) => {
         .catch((error) => { res.status(500).json(error); });
 });
 
+app.get('/api/services', (req, res) => {
+    dao.getAllServices()
+        .then((services) => { res.json(services); })
+        .catch((error) => { res.status(500).json(error); });
+});
+
 app.post('/api/services', isAdmin, async (req, res) => {
     const name = req.body.name;
     const time = req.body.time;
