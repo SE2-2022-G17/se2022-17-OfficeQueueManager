@@ -43,7 +43,20 @@ async function getUserInfo() {
     }
 }
 
+async function createService(service) {
+    const response = await fetch(url + '/api/services', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(service),
+    }).catch(function (error) {
+        console.log('Failed to store data on server: ', error);
+    });
+    return response;
+}
 
-const API = { getTeam, logIn, logOut, getUserInfo };
+
+const API = { getTeam, logIn, logOut, getUserInfo, createService };
 
 export default API;

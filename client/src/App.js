@@ -1,8 +1,6 @@
-import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import React, { useState, useEffect } from 'react';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
@@ -54,29 +52,14 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
 
         {
           loggedIn === false ?
             <LoginForm doLogIn={doLogIn} />
-            : <LogoutBox doLogOut={doLogOut} user={user} />
+            : <MainContent doLogOut={doLogOut} user={user} />
         }
 
-        <Container fluid className="authors">
-          <Row>
-            {
-              team.map((member, index) => {
-                return (
-                  team.length !== 0 ?
-                    <Col key={index}>
-                      <p>{member.first + " " + member.last}</p>
-                    </Col>
-                    : undefined
-                );
-              })
-            }
-          </Row>
-        </Container>
+
 
       </header>
     </div>
@@ -127,14 +110,75 @@ function LoginForm(props) {
   );
 }
 
-function LogoutBox(props) {
+function MainContent(props) {
   return (
     <Col>
       <p>Welcome, {props.user.username}!</p>
       <p>Role: {props.user.role}</p>
+      {
+        props.user.role === 'ADMIN' ?
+          <NewTaskForm />
+          : undefined
+      }
       <Button onClick={props.doLogOut}>Logout</Button>
     </Col>
   );
 }
 
+function NewTaskForm() {
+  const [name, setName] = useState('');
+  const [time, setTime] = useState('');
+
+  const createNewService = async (event) => {
+    event.preventDefault();
+    const service = {
+      name: name,
+      time: parseFloat(time)
+    };
+
+    let valid = true;
+    if (name === '' || isNaN(parseFloat(time)) || parseFloat(time) === 0.0)
+      valid = false;
+
+    if (valid) {
+      await API.createService(service);
+    } else {
+      console.log('Invalid form');
+    }
+  }
+
+  return (
+    <Form>
+      <Row>
+
+        <Col className='alignCenter'>
+          <Form.Group className="mb-3" controlId="formServiceName">
+            <Form.Control
+              type="text"
+              placeholder="Enter service name"
+              onChange={ev => setName(ev.target.value)}
+            />
+          </Form.Group>
+        </Col>
+
+        <Col className='alignCenter'>
+          <Form.Group className="mb-3" controlId="formServiceTime">
+            <Form.Control
+              type="text"
+              placeholder="Enter service time"
+              onChange={ev => setTime(ev.target.value)}
+            />
+          </Form.Group>
+        </Col>
+
+        <Col>
+          <Button variant="primary" type="submit" onClick={createNewService}>
+            Create
+          </Button>
+        </Col>
+
+      </Row>
+    </Form>
+  )
+}
 export default App;
