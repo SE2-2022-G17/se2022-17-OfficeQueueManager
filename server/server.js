@@ -1,5 +1,7 @@
 'use strict';
 
+const dayjs = require("dayjs");
+
 const express = require('express');
 const morgan = require('morgan');
 const dao = require('./dao');
@@ -60,7 +62,28 @@ app.get('/api/team', (req, res) => {
         .catch((error) => { res.status(500).json(error); });
 });
 
+app.post('/api/setServiceForUser', async (req, res) => {
+    dao.getIdFromUser(req.body.user)
+    .then(userId => {
+        dao.getIdFromService(req.body.service)
+        .then(serviceId => {
+            const service = {
+                userId: userId,
+                serviceId: serviceId,
+                requestTimeStamp: dayjs().format("YYYY-MM-DD HH:mm:ss")
+            };
+            console.log(userId);
+            console.log(serviceId);
+            dao.createReservation(service).then(()=>res.end)
+            .catch((error) => { res.status(500).json(error); })
+        })
+        .catch((error) => { res.status(500).json(error); })
+    })
+    .catch((error) => { res.status(500).json(error); })
+});
 
+
+    
 /*** Users APIs ***/
 
 // POST /sessions

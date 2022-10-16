@@ -5,6 +5,19 @@ async function getTeam() {
     return response.json();
 }
 
+async function setServiceForUser(user,service){
+    const response = await fetch(url + '/api/setServiceForUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({user: user,service: service}),
+    }).catch(function (error) {
+        console.log('Failed to store data on server: ', error);
+    });
+    return response;
+}
+
 async function logIn(credentials) {
     let response = await fetch(url + '/api/sessions', {
         method: 'POST',
@@ -44,6 +57,6 @@ async function getUserInfo() {
 }
 
 
-const API = { getTeam, logIn, logOut, getUserInfo };
+const API = { getTeam, logIn, logOut, getUserInfo, setServiceForUser };
 
 export default API;
