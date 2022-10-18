@@ -112,7 +112,7 @@ app.post('/api/serviceCounter', isLoggedIn, [],
 
     const serviceCounter = {
         serviceID: request.body.serviceID,
-        counterID: request.body.counterD,
+        counterID: request.body.counterID,
     };
 
     try {
@@ -126,9 +126,46 @@ app.post('/api/serviceCounter', isLoggedIn, [],
 
 
 //GETSERVICESBYCOUNTERID /api/serviceCounter/:id
-app.get('/api/serviceCounter/:id', async (request, response) => {
+app.get('/api/serviceCounter/:id', isLoggedIn, async (request, response) => {
     try {
         const result = await dao.getServiceByCounterID(request.params.id);
+
+        if (result.error)
+            response.status(404).json(result);
+        else
+            response.json(result);
+    } catch (err) {
+        response.status(500).end();
+    }
+});
+
+
+//ADD /api/counter
+app.post('/api/counter', isLoggedIn, [],
+    async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.array() });
+    }
+
+    const counter = {
+        counterID: request.body.counterID,
+        name: request.body.name,
+    };
+
+    try {
+        await dao.addSCounter(counter);
+        response.status(201).end();
+    }
+    catch (err) {
+        response.status(503).json({ error: `Database error!` });
+    }
+});
+
+//GETALLCOUNTERS /api/counters
+app.get('/api/counters', isLoggedIn, async (request, response) => {
+    try {
+        const result = await dao.getAllCounters();
 
         if (result.error)
             response.status(404).json(result);

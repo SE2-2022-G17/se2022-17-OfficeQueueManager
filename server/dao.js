@@ -30,26 +30,53 @@ exports.addServiceToCounter = (serviceCounter) => {
         const sql = "INSERT INTO serviceCounter(idS, idC) values (?,?)";
         db.run(sql, [serviceCounter.serviceID, serviceCounter.counterID], function (err) {
             if (err) {
-            reject(err);
-            return;
+                reject(err);
+                return;
             } else resolve(this.id);
         })
     });
-  }
+}
 
 
 //get service by counterID
 exports.getServiceByCounterID = (id) => {
     return new Promise((resolve, reject) => {
         const sql = "SELECT * FROM serviceCounters WHERE counterID = ?";
-        db.all(sql,[id], (err, rows) => {
+        db.all(sql, [id], (err, rows) => {
             if (err)
                 reject(err);
             else {
-                const serviceCounter = rows.map(row => ({serviceID: row.serviceID, counterID: row.counterID}));
+                const serviceCounter = rows.map(row => ({ serviceID: row.serviceID, counterID: row.counterID }));
                 resolve(serviceCounter);
             }
         });
     })
 }
 
+//add counter 
+exports.addSCounter = (counter) => {
+    return new Promise((resolve, reject) => {
+        const sql = "INSERT INTO counters(counterID, name) values (?,?)";
+        db.run(sql, [counter.counterID, counter.name], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve(this.id);
+        })
+    });
+}
+
+//get all counters
+exports.getAllCounters= () => {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM counters";
+        db.all(sql, (err, rows) => {
+            if (err)
+                reject(err);
+            else {
+                const counters = rows.map(row => ({ counterID: row.counterID, name: row.name}));
+                resolve(counters);
+            }
+        });
+    })
+}
