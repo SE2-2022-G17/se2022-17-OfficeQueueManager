@@ -23,3 +23,33 @@ exports.getTeam = () => {
         });
     });
 }
+
+//associate service to counter 
+exports.addServiceToCounter = (serviceCounter) => {
+    return new Promise((resolve, reject) => {
+        const sql = "INSERT INTO serviceCounter(idS, idC) values (?,?)";
+        db.run(sql, [serviceCounter.serviceID, serviceCounter.counterID], function (err) {
+            if (err) {
+            reject(err);
+            return;
+            } else resolve(this.id);
+        })
+    });
+  }
+
+
+//get service by counterID
+exports.getServiceByCounterID = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM serviceCounters WHERE counterID = ?";
+        db.all(sql,[id], (err, rows) => {
+            if (err)
+                reject(err);
+            else {
+                const serviceCounter = rows.map(row => ({serviceID: row.serviceID, counterID: row.counterID}));
+                resolve(serviceCounter);
+            }
+        });
+    })
+}
+

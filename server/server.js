@@ -53,13 +53,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-/*** APIs ***/
-app.get('/api/team', (req, res) => {
-    dao.getTeam()
-        .then((team) => { res.json(team); })
-        .catch((error) => { res.status(500).json(error); });
-});
-
 
 /*** Users APIs ***/
 
@@ -98,6 +91,54 @@ app.get('/api/sessions/current', isLoggedIn, (req, res) => {
     else
         res.status(401).json({ error: 'Unauthenticated user!' });
 });
+
+
+/** APIs **/
+
+app.get('/api/team', (req, res) => {
+    dao.getTeam()
+        .then((team) => { res.json(team); })
+        .catch((error) => { res.status(500).json(error); });
+});
+
+
+//ADD /api/serviceCounter
+app.post('/api/serviceCounter', isLoggedIn, [],
+    async (request, response) => {
+    const errors = validationResult(request);
+    if (!errors.isEmpty()) {
+        return response.status(422).json({ errors: errors.array() });
+    }
+
+    const serviceCounter = {
+        serviceID: request.body.serviceID,
+        counterID: request.body.counterD,
+    };
+
+    try {
+        await dao.addServiceToCounter(serviceCounter);
+        response.status(201).end();
+    }
+    catch (err) {
+        response.status(503).json({ error: `Database error!` });
+    }
+});
+
+
+//GETSERVICESBYCOUNTERID /api/serviceCounter/:id
+app.get('/api/serviceCounter/:id', async (request, response) => {
+    try {
+        const result = await dao.getServiceByCounterID(request.params.id);
+
+        if (result.error)
+            response.status(404).json(result);
+        else
+            response.json(result);
+    } catch (err) {
+        response.status(500).end();
+    }
+});
+
 
 
 // activate the server
