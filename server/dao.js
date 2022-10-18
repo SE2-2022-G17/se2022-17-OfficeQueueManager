@@ -70,3 +70,16 @@ exports.getTeam = () => {
         });
     });
 }
+
+exports.getServices = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM services';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(rows);
+        });
+    });
+}

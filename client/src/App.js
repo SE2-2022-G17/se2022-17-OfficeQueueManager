@@ -8,132 +8,72 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import API from './API';
+import {Card} from "react-bootstrap";
+import {TextCenter} from "react-bootstrap-icons";
 
 
 function App() {
-  const [team, setTeam] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+
+  const [services, setServices] = useState([
+    // {
+    //   id: 1,
+    //   title: 'GG'
+    // },
+    // {
+    //   id: 1,
+    //   title: 'GG'
+    // },
+    // {
+    //   id: 1,
+    //   title: 'GG'
+    // },
+    // {
+    //   id: 1,
+    //   title: 'GG'
+    // }
+  ]);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await API.getUserInfo();
-        setUser(user);
-        setLoggedIn(true);
-      } catch (err) {
-        console.log(err.error);
-      }
-    };
-    checkAuth();
+    API.getServices().then((result) => {
+      // setServices(result.json)
+      // console.log(result.json());
+    }) ;
   }, []);
-
-  useEffect(() => {
-    API.getTeam()
-      .then(team => {
-        setTeam(team);
-      })
-      .catch(err => console.log(err));
-  }, []);
-
-  const doLogIn = async (credentials) => {
-    try {
-      const user = await API.logIn(credentials);
-      setUser(user);
-      setLoggedIn(true);
-    } catch (err) {
-      console.log({ msg: err, type: 'danger' });
-    }
-  };
-
-  const doLogOut = async () => {
-    await API.logOut();
-    setLoggedIn(false);
-  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-
-        {
-          loggedIn === false ?
-            <LoginForm doLogIn={doLogIn} />
-            : <LogoutBox doLogOut={doLogOut} user={user} />
-        }
-
-        <Container fluid className="authors">
-          <Row>
-            {
-              team.map((member, index) => {
-                return (
-                  team.length !== 0 ?
-                    <Col key={index}>
-                      <p>{member.first + " " + member.last}</p>
-                    </Col>
-                    : undefined
-                );
-              })
-            }
-          </Row>
-        </Container>
-
-      </header>
-    </div>
+      <main className={'d-flex align-items-center justify-content-center'} style={ { 'height': '100vh' } }>
+        <Row>
+          {
+            services.length > 0 ?
+                services.map(service => <ServiceCard key={service.id} service={service} />) :
+                <NoServices/>
+          }
+        </Row>
+      </main>
   );
 }
 
-function LoginForm(props) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const credentials = { username, password };
-    let valid = true;
-    if (username === '' || password === '' || password.length < 4)
-      valid = false;
-    if (valid) {
-      props.doLogIn(credentials);
-    } else {
-      //TODO: show message
-    }
-  }
-
+function ServiceCard(props) {
   return (
-    <Form>
-      <Form.Group className="mb-3" controlId="formUsername">
-        <Form.Label>Username</Form.Label>
-        <Form.Control
-          type="text"
-          placeholder="Enter username"
-          onChange={ev => setUsername(ev.target.value)}
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3" controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          type="password"
-          placeholder="Password"
-          onChange={ev => setPassword(ev.target.value)}
-        />
-      </Form.Group>
-
-      <Button variant="primary" type="submit" onClick={handleSubmit}>
-        Submit
-      </Button>
-    </Form>
+      <Col md={4}>
+        <Card role={'button'}>
+          <Card.Body className={'text-center'}>
+            <Card.Title>Card Title</Card.Title>
+            <Card.Text>
+              Some quick example text to build on the card title and make up the
+              bulk of the card's content.
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </Col>
   );
 }
 
-function LogoutBox(props) {
-  return (
-    <Col>
-      <p>Welcome, {props.user.username}!</p>
-      <p>Role: {props.user.role}</p>
-      <Button onClick={props.doLogOut}>Logout</Button>
-    </Col>
+function NoServices() {
+  return(
+      <div style={{
+             'font-size': '24px'
+           }}>No Services</div>
   );
 }
 
