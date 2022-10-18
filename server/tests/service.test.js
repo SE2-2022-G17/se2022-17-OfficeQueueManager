@@ -11,7 +11,8 @@ describe("Services test", () => {
     it("get services test", async () => {
         await agent.get('/api/services')
             .then(function (res) {
-                res.should.have.status(200);
+                //res.should.have.status(200);
+                expect(res.status).toBe(200);
             });
     });
 });
