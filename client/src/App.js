@@ -1,53 +1,43 @@
-import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import React, { useState, useEffect } from 'react';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import API from './API';
 import {Card} from "react-bootstrap";
-import {TextCenter} from "react-bootstrap-icons";
 
 
 function App() {
 
-  const [services, setServices] = useState([
-    // {
-    //   id: 1,
-    //   title: 'GG'
-    // },
-    // {
-    //   id: 1,
-    //   title: 'GG'
-    // },
-    // {
-    //   id: 1,
-    //   title: 'GG'
-    // },
-    // {
-    //   id: 1,
-    //   title: 'GG'
-    // }
-  ]);
+  const [services, setServices] = useState([]);
+
+  function reserve(serviceId) {
+      API.reserve(serviceId)
+          .then((response) => {
+              console.log(response);
+          }).catch((error) => {
+          console.log(error);
+      });
+  }
 
   useEffect(() => {
     API.getServices().then((result) => {
-      // setServices(result.json)
-      // console.log(result.json());
-    }) ;
+      setServices(result);
+    });
   }, []);
 
   return (
-      <main className={'d-flex align-items-center justify-content-center'} style={ { 'height': '100vh' } }>
-        <Row>
-          {
-            services.length > 0 ?
-                services.map(service => <ServiceCard key={service.id} service={service} />) :
-                <NoServices/>
-          }
+      <main style={ { 'height': '100vh' } }>
+        <Row className={'h-100'}>
+            <Col md={12} className={'my-auto'}>
+                <Row className={'justify-content-center'}>
+                      {
+                        services.length > 0 ?
+                            services.map(service => <ServiceCard key={service.id} service={service} reserve={reserve} />) :
+                            <NoServices/>
+                      }
+                </Row>
+            </Col>
         </Row>
       </main>
   );
@@ -56,13 +46,10 @@ function App() {
 function ServiceCard(props) {
   return (
       <Col md={4}>
-        <Card role={'button'}>
+        <Card role={'button'} onClick={ () => props.reserve( props.service.id ) }>
           <Card.Body className={'text-center'}>
-            <Card.Title>Card Title</Card.Title>
-            <Card.Text>
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </Card.Text>
+            <Card.Title>{ props.service.name }</Card.Title>
+            <Card.Text>{ props.service.description }</Card.Text>
           </Card.Body>
         </Card>
       </Col>
@@ -71,8 +58,8 @@ function ServiceCard(props) {
 
 function NoServices() {
   return(
-      <div style={{
-             'font-size': '24px'
+      <div className={'text-center'} style={{
+             fontSize: '24px'
            }}>No Services</div>
   );
 }
