@@ -54,7 +54,7 @@ exports.getServiceByCounterID = (id) => {
 }
 
 //add counter 
-exports.addSCounter = (counter) => {
+exports.addCounter = (counter) => {
     return new Promise((resolve, reject) => {
         const sql = "INSERT INTO counters(counterID, name) values (?,?)";
         db.run(sql, [counter.counterID, counter.name], function (err) {

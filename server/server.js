@@ -154,7 +154,7 @@ app.post('/api/counter', isLoggedIn, [],
     };
 
     try {
-        await dao.addSCounter(counter);
+        await dao.addCounter(counter);
         response.status(201).end();
     }
     catch (err) {
