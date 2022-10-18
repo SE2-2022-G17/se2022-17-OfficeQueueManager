@@ -47,7 +47,7 @@ async function getUserInfo() {
 //associate service to counter
 async function addServiceToCounter(serviceCounter) {
     return new Promise((resolve, reject) => {
-        fetch(new URL('serviceCounter', APIURL), {
+        fetch(url + '/api/serviceCounter', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -70,7 +70,7 @@ async function addServiceToCounter(serviceCounter) {
 //add counter
 async function addCounter(counter) {
     return new Promise((resolve, reject) => {
-        fetch(new URL('counter', APIURL), {
+        fetch(url + '/api/counter', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -92,7 +92,7 @@ async function addCounter(counter) {
 //GET all counters
 async function getAllCounters() {
     // call: GET /api/counters
-    const response = await fetch(new URL('counters', APIURL), { credentials: 'include' });
+    const response = await fetch(url + '/api/counters', { credentials: 'include' });
     const countersJson = await response.json();
     if (response.ok) {
       return countersJson.map((row) => ({ serviceID: row.serviceID, counterID: row.counterID }));
