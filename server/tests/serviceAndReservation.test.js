@@ -30,3 +30,8 @@ describe("Reservation test", () => {
             });
     });
 });
+
+
+afterAll(() => {
+    app.close();
+});
