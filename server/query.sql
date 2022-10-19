@@ -15,5 +15,6 @@ CREATE TABLE reservations (
 );
 
 
+
 INSERT INTO services (name, time)
     VALUES ('test', 1.0);

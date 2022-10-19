@@ -53,6 +53,7 @@ async function createService(service) {
     return response;
 }
 
+
 async function logIn(credentials) {
     let response = await fetch(url + '/api/sessions', {
         method: 'POST',
@@ -80,6 +81,64 @@ async function logOut() {
     await fetch(url + '/api/sessions/current', { method: 'DELETE' });
 }
 
-const API = { logIn, logOut, getUserInfo, createService, getServices, reserve};
+//associate service to counter
+async function addServiceToCounter(serviceCounter) {
+    return new Promise((resolve, reject) => {
+        fetch(url + '/api/serviceCounter', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ serviceID: serviceCounter.serviceID, counterID: serviceCounter.counterID }),
+        }).then((response) => {
+            if (response.ok) {
+                resolve(null);
+            } else {
+                response.json()
+                    .then((message) => { reject(message); })
+                    .catch(() => { reject({ error: "Cannot parse server response." }) });
+            }
+        }).catch(() => { reject({ error: "Cannot communicate with server." }) });
+    });
+}
+
+
+//add counter
+async function addCounter(counter) {
+    return new Promise((resolve, reject) => {
+        fetch(url + '/api/counter', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({counterID: counter.counterID, name: counter.name}),
+        }).then((response) => {
+            if (response.ok) {
+                resolve(null);
+            } else {
+                response.json()
+                    .then((message) => { reject(message); })
+                    .catch(() => { reject({ error: "Cannot parse server response." }) });
+            }
+        }).catch(() => { reject({ error: "Cannot communicate with server." }) });
+    });
+}
+
+//GET all counters
+async function getAllCounters() {
+    // call: GET /api/counters
+    const response = await fetch(url + '/api/counters', { credentials: 'include' });
+    const countersJson = await response.json();
+    if (response.ok) {
+      return countersJson.map((row) => ({ serviceID: row.serviceID, counterID: row.counterID }));
+    } else {
+      throw countersJson;  // an object with the error coming from the server
+    }
+  }
+
+
+const API = { logIn, logOut, getUserInfo, addServiceToCounter, addCounter, getAllCounters ,createService, getServices, reserve};
 
 export default API;
