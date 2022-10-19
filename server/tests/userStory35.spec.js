@@ -59,3 +59,7 @@ describe('Test API for defining service types', () => {
 
 });
 
+afterAll(() => {
+    app.close();
+});
+
