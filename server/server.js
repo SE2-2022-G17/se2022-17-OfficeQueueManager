@@ -6,7 +6,7 @@ const dao = require('./dao');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const userDao = require('./userDao');
+const userDao = require('./userDao')
 
 passport.use(new LocalStrategy(
     function (username, password, done) {
