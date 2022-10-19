@@ -148,6 +148,33 @@ exports.resetServiceTable = () => {
     });
 }
 
+exports.resetCountersTable = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM counters;';
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+        });
+        resolve();
+    });
+}
+
+exports.resetServiceCounters = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM serviceCounters;';
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+        });
+        resolve();
+    });
+}
+
+
 exports.resetAutoIncrementedServiceId = () => {
     return new Promise((resolve, reject) => {
         const sql = `DELETE FROM sqlite_sequence WHERE name='services';`
