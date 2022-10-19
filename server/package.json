@@ -1,30 +1,31 @@
 {
-    "name": "server",
-    "version": "1.0.0",
-    "description": "se2 server",
-    "main": "server.js",
-    "scripts": {
-        "test": "jest",
-        "start": "node server.js"
-    },
-    "author": "Andrea Amato",
-    "license": "ISC",
-    "dependencies": {
-        "bcrypt": "^5.1.0",
-        "cors": "^2.8.5",
-        "express": "^4.17.1",
-        "express-session": "^1.17.3",
-        "express-validator": "^6.14.2",
-        "morgan": "^1.10.0",
-        "nodemon": "^2.0.7",
-        "passport": "^0.6.0",
-        "passport-local": "^1.0.0",
-        "sqlite3": "^5.0.2"
-    },
-    "devDependencies": {
-        "jest": "^29.2.0",
-        "supertest": "^6.3.0",
-        "chai": "^4.3.6",
-        "chai-http": "^4.3.0"
-    }
+        "name": "server",
+        "version": "1.0.0",
+        "description": "se2 server",
+        "main": "server.js",
+        "scripts": {
+                "test": "jest",
+                "start": "nodemon server.js"
+        },
+        "author": "Andrea Amato",
+        "license": "ISC",
+        "dependencies": {
+                "bcrypt": "^5.1.0",
+                "cors": "^2.8.5",
+                "dayjs": "^1.11.5",
+                "express": "^4.17.1",
+                "express-session": "^1.17.3",
+                "express-validator": "^6.14.2",
+                "morgan": "^1.10.0",
+                "nodemon": "^2.0.7",
+                "passport": "^0.6.0",
+                "passport-local": "^1.0.0",
+                "sqlite3": "^5.0.2"
+        },
+        "devDependencies": {
+                "chai": "^4.3.6",
+                "chai-http": "^4.3.0",
+                "jest": "^29.2.0",
+                "supertest": "^6.3.0"
+        }
 }

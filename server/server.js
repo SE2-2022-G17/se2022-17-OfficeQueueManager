@@ -53,6 +53,12 @@ const isLoggedIn = (req, res, next) => {
     return res.status(401).json({ error: 'not authenticated' });
 };
 
+const isAdmin = (req, res, next) => {
+    if (req.isAuthenticated() && req.user.role == 'ADMIN')
+        return next();
+    return res.status(403).json({ error: 'unauthorized' });
+};
+
 app.use(session({
     secret: 'this is a secret',
     resave: false,
@@ -61,6 +67,57 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+
+
+/*** APIs ***/
+
+app.get('/api/services/:id', (req, res) => {
+    const id = req.params.id;
+    dao.getService(id)
+        .then((service) => { res.json(service); })
+        .catch((error) => { res.status(500).json(error); });
+});
+
+app.post('/api/services', /* isAdmin, */ async (req, res) => {
+    const name = req.body.name;
+    const time = req.body.time;
+
+    try {
+        await dao.createService({
+            name: name,
+            time: time
+        });
+        res.end();
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+app.get('/api/services', (req, res) => {
+    dao.getServices()
+        .then(services => res.json(services))
+        .catch(error => res.status(500).json(error));
+});
+
+
+app.post('/api/reserve', (req, res) => {
+    const serviceId = req.body.serviceId;
+
+    dao.getServiceById(serviceId)
+        .then((service) => {
+            dao.reserve(serviceId)
+                .then(reservationId => {
+                    res.status(201).json({
+                        reservationNumber: service.tag + '' + reservationId
+                    });
+                })
+                .catch((error) => { res.status(500).json(error); });
+        })
+        .catch(error => {
+            res.status(500).json(error);
+        });
+});
 
 
 /*** Users APIs ***/
