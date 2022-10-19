@@ -27,7 +27,8 @@ exports.getTeam = () => {
 //associate service to counter 
 exports.addServiceToCounter = (serviceCounter) => {
     return new Promise((resolve, reject) => {
-        const sql = "INSERT INTO serviceCounter(idS, idC) values (?,?)";
+        const sql = "INSERT INTO serviceCounters(serviceID, counterID) values (?,?)";
+        console.log(serviceCounter);
         db.run(sql, [serviceCounter.serviceID, serviceCounter.counterID], function (err) {
             if (err) {
                 reject(err);

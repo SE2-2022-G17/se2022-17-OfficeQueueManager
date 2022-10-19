@@ -2,11 +2,14 @@
 
 const express = require('express');
 const morgan = require('morgan');
+const { check, validationResult } = require('express-validator');
 const dao = require('./dao');
+const cors = require('cors');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const userDao = require('./userDao');
+
 
 passport.use(new LocalStrategy(
     function (username, password, done) {
@@ -37,6 +40,12 @@ const port = 3001;
 
 app.use(morgan('dev'));
 app.use(express.json());
+
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+  };
+  app.use(cors(corsOptions)); //per l'esame
 
 const isLoggedIn = (req, res, next) => {
     if (req.isAuthenticated())
@@ -114,7 +123,7 @@ app.post('/api/serviceCounter', isLoggedIn, [],
         serviceID: request.body.serviceID,
         counterID: request.body.counterID,
     };
-
+    
     try {
         await dao.addServiceToCounter(serviceCounter);
         response.status(201).end();
