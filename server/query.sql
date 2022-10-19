@@ -4,9 +4,7 @@ drop table if exists services;
 create table services (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
-    description TEXT NOT NULL,
-    tag TEXT NOT NULL,
-    time INTEGER
+    time REAL NOT NULL
 );
 
 CREATE TABLE reservations (
@@ -17,5 +15,5 @@ CREATE TABLE reservations (
 );
 
 
-INSERT INTO services (name, description, tag, time)
-    VALUES ('test', 'test, test, test, test', 'test', 120);
+INSERT INTO services (name, time)
+    VALUES ('test', 1.0);

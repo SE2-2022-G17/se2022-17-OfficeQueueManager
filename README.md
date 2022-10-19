@@ -14,3 +14,8 @@
 - officer (password = officer)
 - user (password = user)
 
+## How to launch tests
+- cd server
+- npm install
+- npm test
+

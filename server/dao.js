@@ -42,3 +42,64 @@ exports.getServices = () => {
         });
     });
 }
+
+exports.getService = (serviceId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM services WHERE id=?';
+        db.get(sql, [serviceId], (err, row) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (row === undefined) {
+                reject({ error: 'Service not found.' });
+            } else {
+                const service = {
+                    id: row.id,
+                    name: row.name,
+                    time: row.time
+                };
+                resolve(service);
+            }
+        });
+    });
+}
+
+exports.createService = (service) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO services (name, time) VALUES (?, ?)';
+        db.run(sql, [service.name, service.time], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(this.lastID);
+        });
+    });
+}
+
+exports.resetServiceTable = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM services;';
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+        });
+        resolve();
+    });
+}
+
+exports.resetAutoIncrementedServiceId = () => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM sqlite_sequence WHERE name='services';`
+        db.run(sql, [], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+        });
+        resolve();
+    });
+}
