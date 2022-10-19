@@ -9,6 +9,16 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const userDao = require('./userDao');
+const http = require('http');
+const {Server} = require('socket.io'); 
+/*(httpServer, {
+    cors: {
+      origin: "http://localhost:3000",
+      methods: ["GET", "POST"],
+      allowedHeaders: ["my-custom-header"],
+      credentials: true
+    }
+})*/
 
 
 passport.use(new LocalStrategy(
@@ -244,8 +254,32 @@ app.get('/api/counters', async (request, response) => {
 
 
 
+const server=http.createServer(app);
+const io = new Server(server);
+let interval;
+let count=1;
+const counters = [{id:1,name:"counter1"},{id:2,name:"counter2"}]; //ARRAY OF COUNTER
+const idToQueue = {}; //ASSOCIATIVE ARRAY BETWEEN COUNTER.ID AND THE USER NUMBER QUEUE
+counters.forEach(counter => {
+    //queue = db.getQueueByCounter()
+    idToQueue[counter.id] = [count,count+1];
+    count=count+2;
+})
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => counters.forEach((counter)=>socket.emit(counter.name,idToQueue[counter.id][0])),1000);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    clearInterval(interval);
+  });
+});
+
 // activate the server
-const server = app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });
 
