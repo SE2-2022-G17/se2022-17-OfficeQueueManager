@@ -3,33 +3,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const dao = require('./dao');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const session = require('express-session');
-const userDao = require('./userDao');
-
-passport.use(new LocalStrategy(
-    function (username, password, done) {
-        userDao.getUser(username, password).then((user) => {
-            if (!user)
-                return done(null, false, { message: 'Incorrect username and/or password.' });
-            return done(null, user);
-        });
-    }
-));
-
-passport.serializeUser((user, done) => {
-    done(null, user.username);
-});
-
-passport.deserializeUser((id, done) => {
-    userDao.getUserById(id)
-        .then(user => {
-            done(null, user);
-        }).catch(err => {
-            done(err, null);
-        });
-});
+const QueueService = require('./services/queueService');
 
 // init express
 const app = new express();
@@ -38,67 +12,24 @@ const port = 3001;
 app.use(morgan('dev'));
 app.use(express.json());
 
-const isLoggedIn = (req, res, next) => {
-    if (req.isAuthenticated())
-        return next();
-    return res.status(401).json({ error: 'not authenticated' });
-};
-
-app.use(session({
-    secret: 'this is a secret',
-    resave: false,
-    saveUninitialized: false
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
 /*** APIs ***/
-app.get('/api/team', (req, res) => {
-    dao.getTeam()
-        .then((team) => { res.json(team); })
-        .catch((error) => { res.status(500).json(error); });
-});
+app.get('/api/reservations', (req, res) => {
 
-
-/*** Users APIs ***/
-
-// POST /sessions
-// login
-app.post('/api/sessions', function (req, res, next) {
-    passport.authenticate('local', (err, user, info) => {
-        if (err)
-            return next(err);
-        if (!user) {
-            return res.status(401).json(info);
-        }
-        req.login(user, (err) => {
-            if (err)
-                return next(err);
-            return res.json(req.user);
+    QueueService.getQueue()
+        .then((result) => {
+            res.status(200).json(result);
         });
-    })(req, res, next);
 });
 
-// DELETE /sessions/current
-// logout
-app.delete('/api/sessions/current', (req, res) => {
-    req.logout(function (err) {
-        if (err) { return next(err); }
-        res.end();
-    });
-});
+app.put('/api/next-ticket', (req, res) => {
 
-// GET /sessions/current
-// check wheter the user is Logged in or not
-app.get('/api/sessions/current', isLoggedIn, (req, res) => {
-    if (req.isAuthenticated()) {
-        res.status(200).json(req.user);
-    }
-    else
-        res.status(401).json({ error: 'Unauthenticated user!' });
-});
+    const counterId = req.body.counterId;
 
+    QueueService.getNextQueue(counterId)
+        .then((result) => {
+            res.status(200).json(result);
+        });
+});
 
 // activate the server
 app.listen(port, () => {
