@@ -1,43 +1,44 @@
 'use strict';
 
 const sqlite = require('sqlite3');
+const dayjs = require("dayjs");
 
 const db = new sqlite.Database('db.sqlite3', (err) => {
-    if (err) throw err;
+    if (err) console.error(err);
 });
 
-exports.getTeam = () => {
+exports.reserve = (serviceId) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM team';
-        db.all(sql, [], (err, rows) => {
+        const sql = 'INSERT INTO reservations (service_id, time) VALUES (?, ?)';
+        db.run(sql, [serviceId, dayjs()], function (err) {
             if (err) {
                 reject(err);
-                return;
             }
-            const team = rows.map((member) => ({
-                first: member.first,
-                last: member.last,
-                studentId: member.student_id
-            }));
-            resolve(team);
+            resolve(this.lastID);
         });
     });
 }
 
-exports.getAllServices = () => {
+exports.getServiceById = (serviceId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM services WHERE id = ?';
+        db.get(sql, [serviceId], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(row);
+        });
+    });
+}
+
+exports.getServices = () => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM services';
         db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err);
-                return;
             }
-            const services = rows.map((service) => ({
-                id: service.id,
-                name: service.name,
-                time: service.time
-            }));
-            resolve(services);
+            resolve(rows);
         });
     });
 }
@@ -64,6 +65,63 @@ exports.getService = (serviceId) => {
     });
 }
 
+//associate service to counter 
+exports.addServiceToCounter = (serviceCounter) => {
+    return new Promise((resolve, reject) => {
+        const sql = "INSERT INTO serviceCounters(serviceID, counterID) values (?,?)";
+        console.log(serviceCounter);
+        db.run(sql, [serviceCounter.serviceID, serviceCounter.counterID], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve(this.id);
+        })
+    });
+}
+
+
+//get service by counterID
+exports.getServiceByCounterID = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM serviceCounters WHERE counterID = ?";
+        db.all(sql, [id], (err, rows) => {
+            if (err)
+                reject(err);
+            else {
+                const serviceCounter = rows.map(row => ({ serviceID: row.serviceID, counterID: row.counterID }));
+                resolve(serviceCounter);
+            }
+        });
+    })
+}
+
+//add counter 
+exports.addCounter = (counter) => {
+    return new Promise((resolve, reject) => {
+        const sql = "INSERT INTO counters(counterID, name) values (?,?)";
+        db.run(sql, [counter.counterID, counter.name], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve(this.id);
+        })
+    });
+}
+
+//get all counters
+exports.getAllCounters= () => {
+    return new Promise((resolve, reject) => {
+        const sql = "SELECT * FROM counters";
+        db.all(sql, (err, rows) => {
+            if (err)
+                reject(err);
+            else {
+                const counters = rows.map(row => ({ counterID: row.counterID, name: row.name}));
+                resolve(counters);
+            }
+        });
+    })
+}
 exports.createService = (service) => {
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO services (name, time) VALUES (?, ?)';
