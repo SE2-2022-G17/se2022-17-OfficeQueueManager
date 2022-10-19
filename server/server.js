@@ -59,19 +59,9 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 /*** APIs ***/
-
-app.get('/api/team', (req, res) => {
-    dao.getTeam()
-        .then((team) => { res.json(team); })
-        .catch((error) => { res.status(500).json(error); });
-});
-
-app.get('/api/services', (req, res) => {
-    dao.getAllServices()
-        .then((services) => { res.json(services); })
-        .catch((error) => { res.status(500).json(error); });
-});
 
 app.get('/api/services/:id', (req, res) => {
     const id = req.params.id;
@@ -93,6 +83,31 @@ app.post('/api/services', /* isAdmin, */ async (req, res) => {
     } catch (error) {
         res.status(500).json(error);
     }
+});
+
+app.get('/api/services', (req, res) => {
+    dao.getServices()
+        .then(services => res.json(services))
+        .catch(error => res.status(500).json(error));
+});
+
+
+app.post('/api/reserve', (req, res) => {
+    const serviceId = req.body.serviceId;
+
+    dao.getServiceById(serviceId)
+        .then((service) => {
+            dao.reserve(serviceId)
+                .then(reservationId => {
+                    res.status(201).json({
+                        reservationNumber: service.tag + '' + reservationId
+                    });
+                })
+                .catch((error) => { res.status(500).json(error); });
+        })
+        .catch(error => {
+            res.status(500).json(error);
+        });
 });
 
 
@@ -134,10 +149,10 @@ app.get('/api/sessions/current', isLoggedIn, (req, res) => {
         res.status(401).json({ error: 'Unauthenticated user!' });
 });
 
-
 // activate the server
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });
 
-module.exports = app;
+module.exports = server;
+
