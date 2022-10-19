@@ -34,13 +34,11 @@ app.post('/api/reserve',  (req, res) => {
         .catch(error => {
             res.status(500).json(error);
         });
-
 });
 
 // activate the server
 const server = app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });
-
 
 module.exports = server;

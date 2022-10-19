@@ -43,6 +43,24 @@ function App() {
   );
 }
 
+function ServicesMain(props) {
+    return (
+        <main style={ { 'height': '100vh' } }>
+            <Row className={'h-100'}>
+                <Col md={12} className={'my-auto'}>
+                    <Row className={'justify-content-center'}>
+                        {
+                            props.services.length > 0 ?
+                                props.services.map(service => <ServiceCard key={service.id} service={service} reserve={props.reserve} />) :
+                                <NoServices/>
+                        }
+                    </Row>
+                </Col>
+            </Row>
+        </main>
+    );
+}
+
 function ServiceCard(props) {
   return (
       <Col md={4}>
