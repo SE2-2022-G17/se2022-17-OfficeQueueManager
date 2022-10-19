@@ -129,8 +129,11 @@ function NewTaskForm() {
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
 
-  const [serviceId,setServiceId] = useState('');  // This two states are used to associate a counter to a service
-  const [counterIdForService,setCounterIdForService] = useState(''); 
+  const [counterName, setCounterName] = useState('');
+  const [counterId,setCounterId] = useState('');
+
+  const [serviceId, setServiceId] = useState('');  // This two states are used to associate a counter to a service
+  const [counterIdForService, setCounterIdForService] = useState('');
 
   const createNewService = async (event) => {
     event.preventDefault();
@@ -150,6 +153,24 @@ function NewTaskForm() {
     }
   }
 
+  const createNewCounter = async (event) => {
+    event.preventDefault();
+    const counter = {
+      counterID: counterId,
+      name: counterName,
+    };
+
+    let valid = true;
+    if (counterName === '' || counterId === '')
+      valid = false;
+
+    if (valid) {
+      await API.addCounter(counter);
+    } else {
+      console.log('Invalid form');
+    }
+  }
+
   const associateCounterToService = async (event) => {
     event.preventDefault();
 
@@ -159,8 +180,8 @@ function NewTaskForm() {
 
     if (valid) {
       const serviceCounter = {
-        serviceID:serviceId,
-        counterID:counterIdForService
+        serviceID: serviceId,
+        counterID: counterIdForService
       };
       await API.addServiceToCounter(serviceCounter);
     } else {
@@ -195,6 +216,37 @@ function NewTaskForm() {
         <Col>
           <Button variant="primary" type="submit" onClick={createNewService}>
             Create
+          </Button>
+        </Col>
+
+      </Row>
+
+
+      <Row>
+
+        <Col className='alignCenter'>
+          <Form.Group className="mb-3" controlId="formCounterName">
+            <Form.Control
+              type="text"
+              placeholder="Enter counter ID"
+              onChange={ev => setCounterId(ev.target.value)}
+            />
+          </Form.Group>
+        </Col>
+
+        <Col className='alignCenter'>
+          <Form.Group className="mb-3" controlId="formCounterId">
+            <Form.Control
+              type="text"
+              placeholder="Enter counter name"
+              onChange={ev => setCounterName(ev.target.value)}
+            />
+          </Form.Group>
+        </Col>
+
+        <Col>
+          <Button variant="primary" type="submit" onClick={createNewCounter}>
+            Add Counter
           </Button>
         </Col>
 
