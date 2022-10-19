@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import API from './API';
 import { Card } from "react-bootstrap";
+import UserNotification from './modules/UserNotification';
 
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
             <>
               <LoginForm doLogIn={doLogIn} />
               <ServicesMain services={services} reserve={reserve} />
+              <UserNotification />
             </>
             : <MainContent doLogOut={doLogOut} user={user} />
         }
