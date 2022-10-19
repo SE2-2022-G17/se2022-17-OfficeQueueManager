@@ -112,13 +112,13 @@ app.get('/api/team', (req, res) => {
 
 
 //ADD /api/serviceCounter
-app.post('/api/serviceCounter', isLoggedIn, [],
+app.post('/api/serviceCounter', [],
     async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
         return response.status(422).json({ errors: errors.array() });
     }
-
+ 
     const serviceCounter = {
         serviceID: request.body.serviceID,
         counterID: request.body.counterID,
@@ -135,7 +135,7 @@ app.post('/api/serviceCounter', isLoggedIn, [],
 
 
 //GETSERVICESBYCOUNTERID /api/serviceCounter/:id
-app.get('/api/serviceCounter/:id', isLoggedIn, async (request, response) => {
+app.get('/api/serviceCounter/:id', async (request, response) => {
     try {
         const result = await dao.getServiceByCounterID(request.params.id);
 
@@ -150,7 +150,7 @@ app.get('/api/serviceCounter/:id', isLoggedIn, async (request, response) => {
 
 
 //ADD /api/counter
-app.post('/api/counter', isLoggedIn, [],
+app.post('/api/counter', [],
     async (request, response) => {
     const errors = validationResult(request);
     if (!errors.isEmpty()) {
@@ -172,7 +172,7 @@ app.post('/api/counter', isLoggedIn, [],
 });
 
 //GETALLCOUNTERS /api/counters
-app.get('/api/counters', isLoggedIn, async (request, response) => {
+app.get('/api/counters', async (request, response) => {
     try {
         const result = await dao.getAllCounters();
 
@@ -188,6 +188,8 @@ app.get('/api/counters', isLoggedIn, async (request, response) => {
 
 
 // activate the server
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server listening at http://localhost:${port}`);
 });
+
+module.exports = server;
