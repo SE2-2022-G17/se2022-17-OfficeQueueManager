@@ -2,7 +2,6 @@
 
 const express = require('express');
 const morgan = require('morgan');
-const dao = require('./dao');
 const QueueService = require('./services/queueService');
 
 // init express

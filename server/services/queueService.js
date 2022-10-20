@@ -1,4 +1,5 @@
 const dao = require('../dao');
+const dayjs = require('dayjs');
 const HelperService = require('./helperService');
 
 class QueueService {
@@ -52,7 +53,6 @@ class QueueService {
             const feedback = await dao.deleteReservation(reservation.id)
                                         .then(result => result)
                                         .catch(error => { console.log(error) });
-            // const feedback = 1;
 
             // if true return code otherwise error message
             if (feedback)
@@ -70,38 +70,75 @@ class QueueService {
                                     .then(counters => counters)
                                     .catch(error => { console.log(error) });
 
+        /** @var {Array} services **/
         const services = await dao.getServices()
                                     .then(services => services)
                                     .catch(error => { console.log(error) });
 
+        // traverse all counter and set reservations for each
         for (const counter of counters) {
 
+            let counterReservations = [];
+
+            // get counter services
             let serviceIds = await dao.getServiceIdsByCounterId(counter.id)
                                         .then(serviceIds => serviceIds)
                                         .catch(error => { console.log(error) });
 
+            // convert to array
             serviceIds = HelperService.convertServiceIdsObjectArray2ServiceIdsArray(serviceIds);
 
+            // if empty counter has not services and reservations respectively
             if (serviceIds.length === 0) {
-                result[counter.id] = false;
+                result[counter.id] = counterReservations;
                 continue;
             }
 
-
+            // get services reservations
             const reservations = await dao.getReservationsByServiceIds(serviceIds)
                                             .then(reservations => reservations)
                                             .catch(error => { console.log(error) });
 
+            // traverse each reservation and calculate time
             for (const reservation of reservations) {
 
+                // how many reservations before current one
                 const lengthAhead = this.countReservationsBeforeOneReservation(reservations, reservation);
 
+                // average time for services
                 const averageServiceTime = this.calculateServicesAverage(services, serviceIds);
 
-                const waitingTime = this.calculateReservationWaitingTime(averageServiceTime, serviceIds, lengthAhead);
+                // calculate waiting time using formula
+                const waitingTime = this.calculateReservationWaitingTime(averageServiceTime, serviceIds.length, lengthAhead);
 
+                // get corresponding service for using tag
+                const service = services.find(service => service.id === reservation.service_id);
+
+                // push reservation for corresponding counter
+                counterReservations.push({
+                    reservationNumber: service.tag + reservation.id,
+                    waitTime: this.secondsToTime(waitingTime)
+                });
             }
+
+            // assign reservations for counter
+            result[counter.name] = counterReservations;
         }
+
+        return result;
+    }
+
+    static secondsToTime(seconds)
+    {
+        let sec_num = parseInt(seconds, 10)
+        let hours   = Math.floor(sec_num / 3600)
+        let minutes = Math.floor(sec_num / 60) % 60
+        let innerSeconds = sec_num % 60
+
+        return [hours,minutes,innerSeconds]
+            .map(v => v < 10 ? "0" + v : v)
+            .filter((v,i) => v !== "00" || i > 0)
+            .join(":")
     }
 
     static calculateServicesAverage(services, serviceIds)
