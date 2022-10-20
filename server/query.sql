@@ -1,5 +1,5 @@
 drop table if exists reservations;
-drop table if exists counters_services;
+drop table if exists serviceCounters;
 drop table if exists counters;
 drop table if exists services;
 
@@ -12,15 +12,15 @@ create table services (
 );
 
 CREATE TABLE counters (
-                          "id" INTEGER PRIMARY KEY,
+                          "counterID" INTEGER PRIMARY KEY,
                           "name" TEXT UNIQUE
 );
 
-CREATE TABLE counters_services (
-                          "counter_id" INTEGER NOT NULL,
-                          "service_id" INTEGER NOT NULL,
-                          FOREIGN KEY("service_id") REFERENCES services(id)
-                          FOREIGN KEY("counter_id") REFERENCES counters(id)
+CREATE TABLE serviceCounters (
+                          "counterID" INTEGER NOT NULL,
+                          "serviceID" INTEGER NOT NULL,
+                          FOREIGN KEY("serviceID") REFERENCES services(id)
+                          FOREIGN KEY("counterID") REFERENCES counters(id)
 );
 
 CREATE TABLE reservations (
@@ -38,7 +38,7 @@ VALUES ('test', 'test, test, test, test', 'test', 120),
 INSERT INTO counters (name)
 VALUES ("Counter1"), ("Counter2");
 
-INSERT INTO counters_services (counter_id, service_id)
+INSERT INTO serviceCounters (counterID, serviceID)
 VALUES (1, 1), (1, 2), (2, 3);
 
 INSERT INTO reservations (service_id, time)

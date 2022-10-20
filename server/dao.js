@@ -8,7 +8,7 @@ const db = new sqlite.Database('db.sqlite3', (err) => {
 
 exports.getServiceIdsByCounterId = (counterId) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT service_id AS serviceId FROM counters_services WHERE counter_id = ?;';
+        const sql = 'SELECT serviceID AS serviceId FROM serviceCounters WHERE counterID = ?;';
         db.all(sql, [counterId], (err, serviceIds) => {
             if (err) {
                 reject(err);

@@ -1,5 +1,4 @@
 const dao = require('../dao');
-const dayjs = require('dayjs');
 const HelperService = require('./helperService');
 
 class QueueService {
@@ -81,7 +80,7 @@ class QueueService {
             let counterReservations = [];
 
             // get counter services
-            let serviceIds = await dao.getServiceIdsByCounterId(counter.id)
+            let serviceIds = await dao.getServiceIdsByCounterId(counter.counterID)
                                         .then(serviceIds => serviceIds)
                                         .catch(error => { console.log(error) });
 
@@ -90,7 +89,7 @@ class QueueService {
 
             // if empty counter has not services and reservations respectively
             if (serviceIds.length === 0) {
-                result[counter.id] = counterReservations;
+                result[counter.counterID] = counterReservations;
                 continue;
             }
 
