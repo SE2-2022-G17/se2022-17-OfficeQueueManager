@@ -9,8 +9,9 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const userDao = require('./userDao');
+const QueueService = require('./services/queueService');
 const http = require('http');
-const {Server} = require('socket.io'); 
+const { Server } = require('socket.io');
 /*(httpServer, {
     cors: {
       origin: "http://localhost:3000",
@@ -54,8 +55,9 @@ app.use(express.json());
 const corsOptions = {
     origin: 'http://localhost:3000',
     credentials: true,
-  };
-  app.use(cors(corsOptions)); //per l'esame
+};
+
+app.use(cors(corsOptions)); //per l'esame
 
 const isLoggedIn = (req, res, next) => {
     if (req.isAuthenticated())
@@ -81,6 +83,23 @@ app.use(passport.session());
 
 
 /*** APIs ***/
+app.get('/api/reservations', (req, res) => {
+
+    QueueService.getQueue()
+        .then((result) => {
+            res.status(200).json(result);
+        });
+});
+
+app.put('/api/next-ticket', (req, res) => {
+
+    const counterId = req.body.counterId;
+
+    QueueService.getNextQueue(counterId)
+        .then((result) => {
+            res.status(200).json(result);
+        });
+});
 
 app.get('/api/services/:id', (req, res) => {
     const id = req.params.id;
@@ -119,7 +138,7 @@ app.post('/api/reserve', (req, res) => {
             dao.reserve(serviceId)
                 .then(reservationId => {
                     res.status(201).json({
-                        reservationNumber: service.tag + '' + reservationId
+                        reservationNumber: reservationId
                     });
                 })
                 .catch((error) => { res.status(500).json(error); });
@@ -171,13 +190,6 @@ app.get('/api/sessions/current', isLoggedIn, (req, res) => {
 
 /** APIs **/
 
-app.get('/api/team', (req, res) => {
-    dao.getTeam()
-        .then((team) => { res.json(team); })
-        .catch((error) => { res.status(500).json(error); });
-});
-
-
 //ADD /api/serviceCounter
 app.post('/api/serviceCounter', [],
     async (request, response) => {
@@ -185,12 +197,12 @@ app.post('/api/serviceCounter', [],
     if (!errors.isEmpty()) {
         return response.status(422).json({ errors: errors.array() });
     }
- 
+
     const serviceCounter = {
         serviceID: request.body.serviceID,
         counterID: request.body.counterID,
     };
-    
+
     try {
         await dao.addServiceToCounter(serviceCounter);
         response.status(201).end();

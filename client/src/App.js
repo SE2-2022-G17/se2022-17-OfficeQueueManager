@@ -10,13 +10,16 @@ import API from './API';
 import { Card } from "react-bootstrap";
 import UserNotification from './modules/UserNotification';
 
+import { MainComponent } from './MainComponent';
+
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [reservationNumber, setReservationNumber] = useState("");
   const [services, setServices] = useState([]);
-  const [reserveBack,setReserveBack] = useState(false);
-  const [reserveInfo,setReserveInfo] = useState("");
+  const [reserveBack, setReserveBack] = useState(false);
+  const [reserveInfo, setReserveInfo] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -63,6 +66,22 @@ function App() {
     setLoggedIn(false);
   };
 
+  const callNext = async (counterId) => {
+    API.reservations(counterId)
+      .then((reservations) => {
+        if (reservations === undefined)
+          console.log("counter inesistente");
+        else
+          if (reservations[0].reservationNumber === undefined) {
+            console.log("Coda vuota");
+            setReservationNumber(undefined);
+          }
+          else {
+            setReservationNumber(reservations[0].reservationNumber);
+          }
+      });
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -72,14 +91,15 @@ function App() {
             <>
               <LoginForm doLogIn={doLogIn} />
               {
-                reserveBack ? 
-                  <Alert variant='success'>{reserveInfo}</Alert>:
+                reserveBack ?
+                  <Alert variant='success'>{reserveInfo}</Alert> :
                   <></>
               }
               <ServicesMain services={services} reserve={reserve} />
               <UserNotification />
             </>
-            : <MainContent doLogOut={doLogOut} user={user} />
+            : <MainContent doLogOut={doLogOut} user={user} callNext={callNext} resNumber={reservationNumber} />
+
         }
       </header>
     </div>
@@ -143,6 +163,11 @@ function MainContent(props) {
           <NewTaskForm />
           : undefined
       }
+      {
+        props.user.role === 'OFFICER' ?
+          <MainComponent callNext={props.callNext} resNumber={props.resNumber} />
+          : undefined
+      }
       <Button onClick={props.doLogOut}>Logout</Button>
     </Col>
   );
@@ -151,19 +176,19 @@ function MainContent(props) {
 function NewTaskForm() {
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
-  const [newServiceSent,setNewServiceSent] = useState(false);
-  const [newServiceResp,setNewServiceResp] = useState(false); 
+  const [newServiceSent, setNewServiceSent] = useState(false);
+  const [newServiceResp, setNewServiceResp] = useState(false);
 
   const [counterName, setCounterName] = useState('');
-  const [counterId,setCounterId] = useState('');
-  const [newCounterSent,setNewCounterSent] = useState(false);
-  const [newCounterResp,setNewCounterResp] = useState(false); 
+  const [counterId, setCounterId] = useState('');
+  const [newCounterSent, setNewCounterSent] = useState(false);
+  const [newCounterResp, setNewCounterResp] = useState(false);
 
   const [serviceId, setServiceId] = useState('');  // This two states are used to associate a counter to a service
   const [counterIdForService, setCounterIdForService] = useState('');
-  const [counterServiceSent,setCounterServiceSent] = useState(false);
-  const [counterServiceResp,setCounterServiceResp] = useState(false);
-  
+  const [counterServiceSent, setCounterServiceSent] = useState(false);
+  const [counterServiceResp, setCounterServiceResp] = useState(false);
+
   const createNewService = async (event) => {
     event.preventDefault();
     const service = {
@@ -177,13 +202,12 @@ function NewTaskForm() {
     setNewServiceSent(true);
     if (valid) {
       const result = await API.createService(service);
-      if(result.ok){
+      if (result.ok) {
         setNewServiceResp(true);
         setName('');
         setTime('');
       }
-      else
-      {
+      else {
         setNewServiceResp(false);
       }
     } else {
@@ -205,14 +229,14 @@ function NewTaskForm() {
 
     if (valid) {
       API.addCounter(counter)
-      .then(() => {
-        setNewCounterResp(true);
-        setCounterId('');
-        setCounterName('');
-      })
-      .catch(err => {
-        setNewCounterResp(false);
-      }) 
+        .then(() => {
+          setNewCounterResp(true);
+          setCounterId('');
+          setCounterName('');
+        })
+        .catch(err => {
+          setNewCounterResp(false);
+        })
     } else {
       console.log('Invalid form');
       setNewCounterResp(false);
@@ -232,14 +256,14 @@ function NewTaskForm() {
         counterID: counterIdForService
       };
       API.addServiceToCounter(serviceCounter)
-      .then(()=>{
-        setCounterServiceResp(true);
-        setCounterIdForService('');
-        setServiceId('');
-      })
-      .catch(err=>{
-        setCounterServiceResp(false);
-      });
+        .then(() => {
+          setCounterServiceResp(true);
+          setCounterIdForService('');
+          setServiceId('');
+        })
+        .catch(err => {
+          setCounterServiceResp(false);
+        });
     } else {
       console.log('Invalid form');
       setCounterServiceResp(false);
@@ -278,15 +302,15 @@ function NewTaskForm() {
           </Button>
         </Col>
       </Row>
-      
+
       <Row>
-      {
-        newServiceSent ?
-          newServiceResp ? 
-            <Alert variant='success'>Service correctly created.</Alert>:
-            <Alert variant='danger'>Error.</Alert>
-        : <></>
-      }
+        {
+          newServiceSent ?
+            newServiceResp ?
+              <Alert variant='success'>Service correctly created.</Alert> :
+              <Alert variant='danger'>Error.</Alert>
+            : <></>
+        }
       </Row>
 
       <Row>
@@ -321,13 +345,13 @@ function NewTaskForm() {
       </Row>
 
       <Row>
-      {
-        newCounterSent ?
-          newCounterResp ? 
-            <Alert variant='success'>Counter correctly created.</Alert>:
-            <Alert variant='danger'>Error.</Alert>
-        : <></>
-      }
+        {
+          newCounterSent ?
+            newCounterResp ?
+              <Alert variant='success'>Counter correctly created.</Alert> :
+              <Alert variant='danger'>Error.</Alert>
+            : <></>
+        }
       </Row>
 
       <Row>
@@ -362,13 +386,13 @@ function NewTaskForm() {
 
       </Row>
       <Row>
-      {
-        counterServiceSent ?
-          counterServiceResp ? 
-            <Alert variant='success'>Counter correctly associated to a service.</Alert>:
-            <Alert variant='danger'>Error.</Alert>
-        : <></>
-      }
+        {
+          counterServiceSent ?
+            counterServiceResp ?
+              <Alert variant='success'>Counter correctly associated to a service.</Alert> :
+              <Alert variant='danger'>Error.</Alert>
+            : <></>
+        }
       </Row>
     </Form>
   )
