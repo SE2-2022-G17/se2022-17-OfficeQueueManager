@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
 import API from './API';
 import { Card } from "react-bootstrap";
 import UserNotification from './modules/UserNotification';
@@ -14,6 +15,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [services, setServices] = useState([]);
+  const [reserveBack,setReserveBack] = useState(false);
+  const [reserveInfo,setReserveInfo] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -38,6 +41,8 @@ function App() {
     API.reserve(serviceId)
       .then((response) => {
         console.log(response);
+        setReserveBack(true);
+        setReserveInfo(response.reservationNumber);
       }).catch((error) => {
         console.log(error);
       });
@@ -66,6 +71,11 @@ function App() {
           loggedIn === false ?
             <>
               <LoginForm doLogIn={doLogIn} />
+              {
+                reserveBack ? 
+                  <Alert variant='success'>{reserveInfo}</Alert>:
+                  <></>
+              }
               <ServicesMain services={services} reserve={reserve} />
               <UserNotification />
             </>
@@ -141,12 +151,18 @@ function MainContent(props) {
 function NewTaskForm() {
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
+  const [newServiceSent,setNewServiceSent] = useState(false);
+  const [newServiceResp,setNewServiceResp] = useState(false); 
 
   const [counterName, setCounterName] = useState('');
   const [counterId,setCounterId] = useState('');
+  const [newCounterSent,setNewCounterSent] = useState(false);
+  const [newCounterResp,setNewCounterResp] = useState(false); 
 
   const [serviceId, setServiceId] = useState('');  // This two states are used to associate a counter to a service
   const [counterIdForService, setCounterIdForService] = useState('');
+  const [counterServiceSent,setCounterServiceSent] = useState(false);
+  const [counterServiceResp,setCounterServiceResp] = useState(false);
   
   const createNewService = async (event) => {
     event.preventDefault();
@@ -158,13 +174,21 @@ function NewTaskForm() {
     let valid = true;
     if (name === '' || isNaN(parseFloat(time)) || parseFloat(time) === 0.0)
       valid = false;
-
+    setNewServiceSent(true);
     if (valid) {
-      await API.createService(service);
-      setName('');
-      setTime('');
+      const result = await API.createService(service);
+      if(result.ok){
+        setNewServiceResp(true);
+        setName('');
+        setTime('');
+      }
+      else
+      {
+        setNewServiceResp(false);
+      }
     } else {
       console.log('Invalid form');
+      setNewServiceResp(false);
     }
   }
 
@@ -174,17 +198,24 @@ function NewTaskForm() {
       counterID: counterId,
       name: counterName,
     };
-
+    setNewCounterSent(true);
     let valid = true;
     if (counterName === '' || counterId === '')
       valid = false;
 
     if (valid) {
-      await API.addCounter(counter);
-      setCounterId('');
-      setCounterName('');
+      API.addCounter(counter)
+      .then(() => {
+        setNewCounterResp(true);
+        setCounterId('');
+        setCounterName('');
+      })
+      .catch(err => {
+        setNewCounterResp(false);
+      }) 
     } else {
       console.log('Invalid form');
+      setNewCounterResp(false);
     }
   }
 
@@ -194,17 +225,24 @@ function NewTaskForm() {
     let valid = true;
     if (serviceId === '' || counterIdForService === '' || isNaN(counterIdForService))
       valid = false;
-
+    setCounterServiceSent(true);
     if (valid) {
       const serviceCounter = {
         serviceID: serviceId,
         counterID: counterIdForService
       };
-      await API.addServiceToCounter(serviceCounter);
-      setCounterIdForService('');
-      setServiceId('');
+      API.addServiceToCounter(serviceCounter)
+      .then(()=>{
+        setCounterServiceResp(true);
+        setCounterIdForService('');
+        setServiceId('');
+      })
+      .catch(err=>{
+        setCounterServiceResp(false);
+      });
     } else {
       console.log('Invalid form');
+      setCounterServiceResp(false);
     }
   }
 
@@ -240,6 +278,16 @@ function NewTaskForm() {
           </Button>
         </Col>
       </Row>
+      
+      <Row>
+      {
+        newServiceSent ?
+          newServiceResp ? 
+            <Alert variant='success'>Service correctly created.</Alert>:
+            <Alert variant='danger'>Error.</Alert>
+        : <></>
+      }
+      </Row>
 
       <Row>
 
@@ -270,7 +318,16 @@ function NewTaskForm() {
             Add Counter
           </Button>
         </Col>
+      </Row>
 
+      <Row>
+      {
+        newCounterSent ?
+          newCounterResp ? 
+            <Alert variant='success'>Counter correctly created.</Alert>:
+            <Alert variant='danger'>Error.</Alert>
+        : <></>
+      }
       </Row>
 
       <Row>
@@ -303,6 +360,15 @@ function NewTaskForm() {
           </Button>
         </Col>
 
+      </Row>
+      <Row>
+      {
+        counterServiceSent ?
+          counterServiceResp ? 
+            <Alert variant='success'>Counter correctly associated to a service.</Alert>:
+            <Alert variant='danger'>Error.</Alert>
+        : <></>
+      }
       </Row>
     </Form>
   )
