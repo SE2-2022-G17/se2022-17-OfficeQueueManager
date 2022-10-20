@@ -168,12 +168,6 @@ function MainContent(props) {
           <MainComponent callNext={props.callNext} resNumber={props.resNumber} />
           : undefined
       }
-
-      {
-        props.user.role === 'OFFICER' ?
-          <MainComponent callNext={props.callNext} resNumber={props.resNumber} />
-          : undefined
-      }
       <Button onClick={props.doLogOut}>Logout</Button>
     </Col>
   );
