@@ -55,7 +55,7 @@ class QueueService {
 
             // if true return code otherwise error message
             if (feedback)
-                return service.tag + reservation.id;
+                return reservation.id;
             else
                 return feedback;
         }
@@ -115,7 +115,7 @@ class QueueService {
 
                 // push reservation for corresponding counter
                 counterReservations.push({
-                    reservationNumber: service.tag + reservation.id,
+                    reservationNumber: reservation.id,
                     waitTime: this.secondsToTime(waitingTime)
                 });
             }
