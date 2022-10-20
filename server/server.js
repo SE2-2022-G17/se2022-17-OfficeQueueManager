@@ -3,6 +3,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const dao = require('./dao');
+const cors = require('cors');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
@@ -38,6 +39,12 @@ const port = 3001;
 
 app.use(morgan('dev'));
 app.use(express.json());
+
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+app.use(cors(corsOptions)); //per l'esame
 
 const isLoggedIn = (req, res, next) => {
     if (req.isAuthenticated())

@@ -1,4 +1,5 @@
 drop table if exists reservations;
+drop table if exists users;
 drop table if exists serviceCounters;
 drop table if exists counters;
 drop table if exists services;
@@ -14,6 +15,14 @@ create table services (
 CREATE TABLE counters (
                           "counterID" INTEGER PRIMARY KEY,
                           "name" TEXT UNIQUE
+);
+
+CREATE TABLE "users" (
+    "id" INTEGER NOT NULL UNIQUE,
+    "username" TEXT NOT NULL UNIQUE,
+    "hash" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'USER',
+    PRIMARY KEY("id" AUTOINCREMENT)
 );
 
 CREATE TABLE serviceCounters (
