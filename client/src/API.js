@@ -1,4 +1,4 @@
-const url  = 'http://localhost:3000';
+const url = 'http://localhost:3000';
 
 async function getTeam() {
     const response = await fetch(url + '/api/team');
@@ -43,7 +43,33 @@ async function getUserInfo() {
     }
 }
 
+async function reservations(counterId) {
+    // call: GET /api/courses
+    const response = await fetch(url + '/api/reservations');
+    const res = await response.json();
+    if (response.ok) {
 
-const API = { getTeam, logIn, logOut, getUserInfo };
+        //res.filter(elem => elem.contain(counterId));
+        let count = "Counter" + counterId;
+        return res[`${count}`];
+    } else {
+        throw res;  // an object with the error coming from the server
+    }
+}
+
+async function setNextTicket(ticket) {
+    const response = await fetch(url + '/api/next-ticket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ticket),
+    }).catch(function (error) {
+        console.log('Failed to store data on server: ', error);
+    });
+    return response;
+}
+
+const API = { getTeam, logIn, logOut, getUserInfo, reservations, setNextTicket };
 
 export default API;

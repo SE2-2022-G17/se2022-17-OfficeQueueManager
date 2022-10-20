@@ -9,11 +9,16 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import API from './API';
 
+import { MainComponent } from './MainComponent';
+
 
 function App() {
   const [team, setTeam] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [reservationNumber, setReservationNumber] = useState("");
+
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -51,6 +56,22 @@ function App() {
     setLoggedIn(false);
   };
 
+  const callNext = async (counterId) => {
+    API.reservations(counterId)
+      .then((reservations) => {
+        if (reservations === undefined)
+          console.log("counter inesistente");
+        else
+          if (reservations[0].reservationNumber === undefined) {
+            console.log("Coda vuota");
+            setReservationNumber(undefined);
+          }
+          else {
+            setReservationNumber(reservations[0].reservationNumber);
+          }
+      });
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -59,7 +80,7 @@ function App() {
         {
           loggedIn === false ?
             <LoginForm doLogIn={doLogIn} />
-            : <LogoutBox doLogOut={doLogOut} user={user} />
+            : <LogoutBox doLogOut={doLogOut} user={user} callNext={callNext} resNumber={reservationNumber} />
         }
 
         <Container fluid className="authors">
@@ -132,6 +153,11 @@ function LogoutBox(props) {
     <Col>
       <p>Welcome, {props.user.username}!</p>
       <p>Role: {props.user.role}</p>
+      {
+        props.user.role === 'OFFICER' ?
+          <MainComponent callNext={props.callNext} resNumber={props.resNumber} />
+          : undefined
+      }
       <Button onClick={props.doLogOut}>Logout</Button>
     </Col>
   );
