@@ -161,6 +161,8 @@ function NewTaskForm() {
 
     if (valid) {
       await API.createService(service);
+      setName('');
+      setTime('');
     } else {
       console.log('Invalid form');
     }
@@ -179,6 +181,8 @@ function NewTaskForm() {
 
     if (valid) {
       await API.addCounter(counter);
+      setCounterId('');
+      setCounterName('');
     } else {
       console.log('Invalid form');
     }
@@ -197,6 +201,8 @@ function NewTaskForm() {
         counterID: counterIdForService
       };
       await API.addServiceToCounter(serviceCounter);
+      setCounterIdForService('');
+      setServiceId('');
     } else {
       console.log('Invalid form');
     }
@@ -211,6 +217,7 @@ function NewTaskForm() {
             <Form.Control
               type="text"
               placeholder="Enter service name"
+              value={name}
               onChange={ev => setName(ev.target.value)}
             />
           </Form.Group>
@@ -221,6 +228,7 @@ function NewTaskForm() {
             <Form.Control
               type="text"
               placeholder="Enter service time"
+              value={time}
               onChange={ev => setTime(ev.target.value)}
             />
           </Form.Group>
@@ -231,8 +239,8 @@ function NewTaskForm() {
             Create
           </Button>
         </Col>
-
       </Row>
+
       <Row>
 
         <Col className='alignCenter'>
@@ -240,6 +248,7 @@ function NewTaskForm() {
             <Form.Control
               type="text"
               placeholder="Enter counter ID"
+              value={counterId}
               onChange={ev => setCounterId(ev.target.value)}
             />
           </Form.Group>
@@ -250,6 +259,7 @@ function NewTaskForm() {
             <Form.Control
               type="text"
               placeholder="Enter counter name"
+              value={counterName}
               onChange={ev => setCounterName(ev.target.value)}
             />
           </Form.Group>
@@ -270,6 +280,7 @@ function NewTaskForm() {
             <Form.Control
               type="text"
               placeholder="Enter service Id"
+              value={serviceId}
               onChange={ev => setServiceId(ev.target.value)}
             />
           </Form.Group>
@@ -280,6 +291,7 @@ function NewTaskForm() {
             <Form.Control
               type="text"
               placeholder="Enter counter id"
+              value={counterIdForService}
               onChange={ev => setCounterIdForService(ev.target.value)}
             />
           </Form.Group>
